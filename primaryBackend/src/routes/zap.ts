@@ -1,3 +1,4 @@
+import { PrismaClient } from "@prisma/client/extension";
 import { Router } from "express";
 import { prismaClient } from "../db/index.js";
 import { authMiddleware } from "../middleware.js";
@@ -6,6 +7,8 @@ import { zapCreateSchema } from "../types/index.js";
 const router = Router();
 
 router.post("/", authMiddleware, async (req, res) => {
+  //@ts-ignore
+  const id = req.id;
   const body = req.body();
   const parsedData = zapCreateSchema.safeParse(body);
 
@@ -15,9 +18,10 @@ router.post("/", authMiddleware, async (req, res) => {
     });
   }
 
-  await prismaClient.$transaction(async (tx:any) => {
+  const zapId = await prismaClient.$transaction(async (tx: any) => {
     const zap = await tx.zap.create({
       data: {
+        userId: id,
         triggerId: "",
         actions: {
           create: parsedData.data.actions.map((x, index) => ({
@@ -29,28 +33,83 @@ router.post("/", authMiddleware, async (req, res) => {
     });
 
     const trigger = await tx.trigger.create({
-      data:{
-        triggerId : parsedData.data.availabletriggerId,
-        zalId : zap.id
-      }
-    })
+      data: {
+        triggerId: parsedData.data.availabletriggerId,
+        zalId: zap.id,
+      },
+    });
 
     await tx.zap.update({
-      where : {
-        id : zap.id
+      where: {
+        id: zap.id,
       },
-      data:{
-        triggerId : trigger.id
-      }
-    })
+      data: {
+        triggerId: trigger.id,
+      },
+    });
 
+    return zap.id;
+  });
+
+  return res.json({
+    zapId,
   });
 });
 
-router.get("/", authMiddleware, (req, res) => {
-  console.log("return the lsit of zaps for the specific user");
+router.get("/", authMiddleware, async (req, res) => {
+  //@ts-ignore
+  const id = req.id;
+
+  const zaps = await prismaClient.zap.findMany({
+    where: {
+      userId: id,
+    },
+    include: {
+      actions: {
+        include: {
+          type: true,
+        },
+      },
+      trigger: {
+        include: {
+          type: true,
+        },
+      },
+    },
+  });
+
+  return res.json({
+    zaps,
+  });
 });
 
-router.get("/:zapId", authMiddleware, (req, res) => {});
+router.get("/:zapId", authMiddleware, async (req, res) => {
+  //@ts-ignore
+  const id = req.id;
+  const zapId = req.params.zapId;
+
+  const zap = await PrismaClient.zap.findFirst({
+    where: {
+      zapId: zapId,
+      userId: id,
+    },
+    include: {
+      trigger: {
+        include: {
+          type: true,
+        },
+      },
+      actions: {
+        include: {
+          type: true,
+        },
+      },
+    },
+  });
+
+  return res.json({
+    zap,
+  });
+});
 
 export const zapRoutes = router;

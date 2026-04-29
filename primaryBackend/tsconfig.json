@@ -41,5 +41,10 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "exclude": ["prisma.config.ts", "src/generated", "dist"]
+  "exclude": ["node_modules", "dist", "prisma", "prisma.config.ts"],
+  "ts-node": {
+    "compilerOptions": {
+      "rootDir": "."
+    }
+  }
 }
