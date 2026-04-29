@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma" 
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User{
+  id Int @id @default(autoincrement())
+  name String
+  email String
+  password String
+}
+
+model Zap{
+  id String @id @default(uuid())
+  triggerId String
+  trigger Trigger?
+  actions Action[]
+  zapRuns ZapRun[]
+}
+
+model Trigger{
+  id String @id @default(uuid())
+  zapId String @unique
+  triggerId String
+  type AvailableTrigger @relation(fields: [triggerId], references: [id])
+  zap Zap @relation(fields: [zapId], references: [id])
+}
+
+model Action{
+   id    String   @id @default(uuid())
+   zapId String 
+   zap   Zap   @relation(fields: [zapId], references: [id])
+   actionId String
+   type AvailableAction @relation(fields: [actionId], references: [id])
+   sortingOrder Int @default(0)
+}
+
+model AvailableTrigger{
+  id String @id @default(uuid())
+  name String
+  trigger Trigger[] 
+}
+
+model AvailableAction{
+  id String @id @default(uuid())
+  name String
+  actions Action[] //one available action can be part of many actions
+}
+
+//more and more trigger happens, the entry will be in this table, so that we can display this to the user
+model ZapRun{
+  id String @id @default(uuid())
+  zapId String
+  metadata Json
+  zap Zap @relation(fields: [zapId], references: [id])
+  ZapRunOutbox ZapRunOutbox? //?- a ZapRun may or may not have an outbox entry
+}
+
+model ZapRunOutbox{
+  id String @id @default(uuid())
+  ZapRunId String @unique
+  ZapRun ZapRun @relation(fields: [ZapRunId], references: [id])
+}
