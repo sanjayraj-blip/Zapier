@@ -3,18 +3,18 @@ import { ReactNode } from "react";
 
 interface ButtonProps {
   children: ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
   size?: "big" | "small";
 }
 
 const PrimaryButton = ({ children, onClick, size = "small" }: ButtonProps) => {
   return (
-    <div
-      className={`${size === "small" ? "text-sm" : "text-xl"} ${size === "small" ? "px-4 pt-2" : "px-8 py-10"} bg-amber-700`}
+    <button
+      className={`${size === "small" ? "text-base px-6 py-1" : "text-lg px-8 py-3"} bg-amber-700 rounded-full text-white font-semibold hover:shadow-md cursor-pointer`}
       onClick={onClick}
     >
       {children}
-    </div>
+    </button>
   );
 };
 

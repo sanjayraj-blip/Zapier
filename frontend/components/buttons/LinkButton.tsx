@@ -8,7 +8,7 @@ interface ButtonProps {
 const LinkButton = ({ children, onClick }: ButtonProps) => {
   return (
     <div
-      className="px-4 py-4 cursor-pointer hover:bg-slate-100"
+      className=" flex flex col justify-content mt-3 p-2 cursor-pointer rounded-sm hover:bg-slate-100 font-light text-sm"
       onClick={onClick}
     >
       {children}

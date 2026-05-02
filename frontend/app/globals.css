@@ -2,4 +2,11 @@
 
 @theme {
   --color-amber-700: #ff4f00;
+  --color-slate-100: #ebe9df;
+}
+
+@layer base {
+  body {
+    background-color: #f5f3f3;
+  }
 }
