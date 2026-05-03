@@ -9,7 +9,7 @@ const router = Router();
 router.post("/", authMiddleware, async (req, res) => {
   //@ts-ignore
   const id = req.id;
-  const body = req.body();
+  const body = req.body;
   const parsedData = zapCreateSchema.safeParse(body);
 
   if (!parsedData.success) {
@@ -35,7 +35,7 @@ router.post("/", authMiddleware, async (req, res) => {
     const trigger = await tx.trigger.create({
       data: {
         triggerId: parsedData.data.availabletriggerId,
-        zalId: zap.id,
+        zapId: zap.id,
       },
     });
 
@@ -88,7 +88,7 @@ router.get("/:zapId", authMiddleware, async (req, res) => {
   const id = req.id;
   const zapId = req.params.zapId;
 
-  const zap = await PrismaClient.zap.findFirst({
+  const zap = await prismaClient.zap.findFirst({
     where: {
       zapId: zapId,
       userId: id,

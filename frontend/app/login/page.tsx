@@ -1,15 +1,14 @@
 "use client";
 
-import Input from "@/components/Input";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
+import Input from "@/components/Input";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BACKEND_URL } from "../config";
 
-const Signup = () => {
+const Login = () => {
   const router = useRouter();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -50,14 +49,6 @@ const Signup = () => {
       <div className="pr-60 flex-1 flex flex-col justify-center items-center px-12 py-12">
         <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg p-8">
           <Input
-            label={"Name"}
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
-            type="text"
-            placeHolder="Your Name"
-          />
-          <Input
             label={"Email"}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -79,24 +70,24 @@ const Signup = () => {
               size="big"
               onClick={async () => {
                 const res = await axios.post(
-                  `${BACKEND_URL}/api/v1/user/signup`,
+                  `${BACKEND_URL}/api/v1/user/signin`,
                   {
                     username: email,
                     password,
-                    name,
                   },
                 );
-                router.push("./login");
+                localStorage.setItem("token", res.data.token);
+                router.push("/dashboard");
               }}
             >
-              Get started for free
+              Login
             </PrimaryButton>
           </div>
 
           <p className="text-center text-gray-600 text-sm mt-6">
-            Already have an account?{" "}
-            <a href="/login" className="text-gray-900 underline font-semibold">
-              Log In
+            New to Zapier?{" "}
+            <a href="/signup" className="text-gray-900 underline font-semibold">
+              Sign up
             </a>
           </p>
         </div>
@@ -105,4 +96,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;
