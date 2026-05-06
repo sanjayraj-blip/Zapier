@@ -16,18 +16,23 @@ async function main() {
     data: [
       {
         name: "Webhook Trigger",
+        image: "https://cdn-icons-png.flaticon.com/512/1995/1995467.png",
       },
       {
         name: "Gmail",
+        image: "https://cdn-icons-png.flaticon.com/512/732/732200.png",
       },
       {
         name: "Scheduled Time",
+        image: "https://cdn-icons-png.flaticon.com/512/2838/2838839.png",
       },
       {
         name: "Database Event",
+        image: "https://cdn-icons-png.flaticon.com/512/4248/4248443.png",
       },
       {
         name: "Form Submission",
+        image: "https://cdn-icons-png.flaticon.com/512/924/924514.png",
       },
     ],
   });
@@ -36,30 +41,39 @@ async function main() {
     data: [
       {
         name: "Send Email",
+        image: "https://cdn-icons-png.flaticon.com/512/3062/3062646.png",
       },
       {
         name: "Send Slack Message",
+        image: "https://cdn-icons-png.flaticon.com/512/3291/3291695.png",
       },
       {
         name: "Save to Database",
+        image: "https://cdn-icons-png.flaticon.com/512/4248/4248443.png",
       },
       {
         name: "Send HTTP Request",
+        image: "https://cdn-icons-png.flaticon.com/512/1995/1995467.png",
       },
       {
         name: "Send SMS",
+        image: "https://cdn-icons-png.flaticon.com/512/681/681494.png",
       },
       {
         name: "Create Notion Page",
+        image: "https://cdn-icons-png.flaticon.com/512/1995/1995573.png",
       },
       {
         name: "Add Google Sheet Row",
+        image: "https://cdn-icons-png.flaticon.com/512/2038/2038582.png",
       },
       {
         name: "Discord Message",
+        image: "https://cdn-icons-png.flaticon.com/512/2111/2111370.png",
       },
       {
         name: "Solana",
+        image: "https://cdn-icons-png.flaticon.com/512/5968/5968836.png",
       },
     ],
   });

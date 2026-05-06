@@ -4,6 +4,8 @@ dotenv.config({ path: ".env" });
 import cors from "cors";
 import express from "express";
 import { prismaClient } from "./db/index.js";
+import { actionRoutes } from "./routes/action.js";
+import { triggerRoutes } from "./routes/trigger.js";
 import { userRoutes } from "./routes/user.js";
 import { zapRoutes } from "./routes/zap.js";
 
@@ -13,6 +15,8 @@ app.use(cors());
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/zap", zapRoutes);
+app.use("/api/v1/trigger", triggerRoutes);
+app.use("/api/v1/action", actionRoutes);
 
 prismaClient.user
   .count()
@@ -26,8 +30,7 @@ prismaClient.user
 
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => {
-  console.log(`✓ Server running on http://localhost:${PORT}`);
-  console.log("✓ Press Ctrl+C to stop");
+  console.log(`Server running on http://localhost:${PORT}`);
 });
 
 server.keepAliveTimeout = 65000;

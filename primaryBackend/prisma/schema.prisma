@@ -50,12 +50,14 @@ model Action{
 model AvailableTrigger{
   id String @id @default(uuid())
   name String
-  trigger Trigger[] 
+  image String?
+  trigger Trigger[]
 }
 
 model AvailableAction{
   id String @id @default(uuid())
   name String
+  image String?
   actions Action[] //one available action can be part of many actions
 }
 
