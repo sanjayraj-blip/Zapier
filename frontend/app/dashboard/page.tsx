@@ -93,8 +93,8 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
     <div className="p-8 max-w-screen-lg w-full">
       <div className="flex">
         <div className="flex-1">Name</div>
-        <div className="flex-1">Last Edit</div>
-        <div className="flex-1">Running</div>
+        <div className="flex-1">Id</div>
+        <div className="flex-1">Created At</div>
         <div className="flex-1">Go</div>
       </div>
       <tbody>

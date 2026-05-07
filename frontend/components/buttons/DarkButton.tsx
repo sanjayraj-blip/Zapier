@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 interface DarkButtonProps {
   children: ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
   size?: "small" | "big";
 }
 

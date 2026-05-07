@@ -2,9 +2,11 @@
 
 import { BACKEND_URL } from "@/app/config";
 import Appbar from "@/components/Appbar";
+import DarkButton from "@/components/buttons/DarkButton";
 import LinkButton from "@/components/buttons/LinkButton";
 import ZapCell from "@/components/ZapCell";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 function useAvailableTriggersAndActions() {
@@ -31,6 +33,7 @@ function useAvailableTriggersAndActions() {
 }
 
 export default function () {
+  const router = useRouter();
   const { loading, actions, triggers } = useAvailableTriggersAndActions();
 
   const [selectedTrigger, setSelectedTrigger] = useState<{
@@ -56,6 +59,34 @@ export default function () {
   return (
     <div>
       <Appbar />
+      <div className="flex justify-end  pt-20 pr-40 bg-slate-200">
+        <DarkButton
+          onClick={async () => {
+            if (!selectedTrigger?.id) {
+              return;
+            }
+            const response = await axios.post(
+              `${BACKEND_URL}/api/v1/zap`,
+              {
+                availabletriggerId: selectedTrigger.id,
+                triggerMetaData: {},
+                actions: selectedActions.map((a) => ({
+                  availableactionId: a.availableActionId,
+                  actionMetaData: {},
+                })),
+              },
+              {
+                headers: {
+                  Authorization: localStorage.getItem("token"),
+                },
+              },
+            );
+            router.push("/dashboard");
+          }}
+        >
+          Publish
+        </DarkButton>
+      </div>
       <div className="w-full min-h-screen bg-slate-200 flex flex-col justify-center">
         <div className="flex justify-center w-full">
           <ZapCell
