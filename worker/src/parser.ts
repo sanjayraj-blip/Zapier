@@ -1,4 +1,4 @@
-export function parse(text: string, values: any, startDelimiter = "{{", endDelimiter = "}}") {
+export function parse(text: string, values: any, startDelimiter = "{", endDelimiter = "}") {
   let startIndex = 0;
   let finalString = "";
 

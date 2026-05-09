@@ -17,6 +17,7 @@
     "kafka": "^0.2.3",
     "kafkajs": "^2.2.4",
     "prisma": "^7.8.0",
+    "resend": "^6.12.3",
     "typescript": "^6.0.3"
   }
 }

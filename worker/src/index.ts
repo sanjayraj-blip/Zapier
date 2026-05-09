@@ -34,6 +34,7 @@ zap {
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
 import { Kafka } from "kafkajs";
+import { sendEmail } from "./email.js";
 import { PrismaClient } from "./generated/prisma/client.js";
 import { parse } from "./parser.js";
 
@@ -51,7 +52,7 @@ const kafka = new Kafka({
 });
 
 async function main() {
-  const consumer = kafka.consumer({ groupId: "main-worker-Date.now()}}" });
+  const consumer = kafka.consumer({ groupId: "main-worker-K" });
   await consumer.connect();
 
   const producer = kafka.producer({
@@ -59,7 +60,7 @@ async function main() {
   });
   await producer.connect();
 
-  await consumer.subscribe({ topic: TOPIC_NAME, fromBeginning: true });
+  await consumer.subscribe({ topic: TOPIC_NAME });
 
   await consumer.run({
     autoCommit: false,
@@ -104,7 +105,6 @@ async function main() {
                   type: true,
                 },
               },
-              trigger: true,
             },
           },
         },
@@ -121,18 +121,17 @@ async function main() {
         return;
       }
 
-      if (currentAction.type.name == "Send Email") {
-        console.log("sending out the email");
+      if (currentAction.type.name === "Send Email") {
+        const zapRunMetadata = zapRunDetails?.metadata;
+        const fromTemplate = (currentAction.metadata as any)?.email as string;
+        const bodyTemplate = (currentAction.metadata as any)?.body as string;
 
-        const body = (currentAction.metadata as any)?.body; // Template: "j jk j ijniubiu"
-        const to = (currentAction.metadata as any)?.email; // Template: "uybyuv uyv"
-        const webhookData = zapRunDetails?.metadata; // Webhook response: { comment: {email: "harkirat@gmail.com", body: "Test message"}}
+        const from = fromTemplate.includes("{") ? parse(fromTemplate, zapRunMetadata) : fromTemplate;
+        const body = parse(bodyTemplate, zapRunMetadata);
+        const to = parse("{comment.to}", zapRunMetadata);
 
-        const parsedBody = parse(body, webhookData);
-        const parsedTo = parse(to, webhookData);
-
-        console.log("Parsed email body:", parsedBody);
-        console.log("Parsed email to:", parsedTo);
+        await sendEmail(from, to, body);
+        console.log(`Sent email from ${from} to ${to}`);
       }
 
       await new Promise((r) => setTimeout(r, 500));
