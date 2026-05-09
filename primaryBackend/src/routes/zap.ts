@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client/extension";
 import { Router } from "express";
 import { prismaClient } from "../db/index.js";
 import { authMiddleware } from "../middleware.js";
@@ -27,6 +26,7 @@ router.post("/", authMiddleware, async (req, res) => {
           create: parsedData.data.actions.map((x, index) => ({
             actionId: x.availableactionId,
             sortingOrder: index,
+            metadata: x.actionMetaData,
           })),
         },
       },
@@ -36,6 +36,7 @@ router.post("/", authMiddleware, async (req, res) => {
       data: {
         triggerId: parsedData.data.availabletriggerId,
         zapId: zap.id,
+        metadata: parsedData.data.triggerMetaData,
       },
     });
 

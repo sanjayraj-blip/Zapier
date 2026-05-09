@@ -5,7 +5,7 @@ import LinkButton from "@/components/buttons/LinkButton";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BACKEND_URL } from "../config";
+import { BACKEND_URL, HOOKS_URL } from "../config";
 
 interface Zap {
   id: string;
@@ -19,6 +19,7 @@ interface Zap {
     type: {
       id: string;
       name: string;
+      image: string;
     };
   }[];
   trigger: {
@@ -28,6 +29,7 @@ interface Zap {
     type: {
       id: string;
       name: string;
+      image: string;
     };
   };
 }
@@ -91,32 +93,39 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
   const router = useRouter();
   return (
     <div className="p-8 max-w-screen-lg w-full">
-      <div className="flex">
-        <div className="flex-1">Name</div>
+      <div className="flex font-bold mb-4 items-center">
+        <div className="w-32">Name</div>
         <div className="flex-1">Id</div>
         <div className="flex-1">Created At</div>
-        <div className="flex-1">Go</div>
+        <div className="flex-1">Webhook URL</div>
+        <div className="w-20 text-center">Go</div>
       </div>
-      <tbody>
-        {zaps.map((z) => (
-          <div className="flex border-b pt-4">
-            <div className="flex-1">
-              {z.trigger.type.name} {z.actions.map((x) => x.type.name + " ")}
-            </div>
-            <div className="flex-1">{z.id}</div>
-            <div className="flex-1">Nov 13,2026</div>
-            <div className="flex-1">
-              <LinkButton
-                onClick={() => {
-                  router.push("/zap/" + z.id);
-                }}
-              >
-                Go
-              </LinkButton>
-            </div>
+      {zaps.map((z) => (
+        <div key={z.id} className="flex border-b pt-4 pb-4 items-center">
+          <div className="w-32 flex">
+            <img
+              src={z.trigger.type.image}
+              className="w-[30px]"
+              alt="trigger"
+            />
+            {z.actions.map((x) => (
+              <img key={x.id} src={x.type.image} width={30} alt="action" />
+            ))}
           </div>
-        ))}
-      </tbody>
+          <div className="flex-1">{z.id}</div>
+          <div className="flex-1">Nov 13,2026</div>
+          <div className="flex-1">{`${HOOKS_URL}/catch/1/${z.id}`}</div>
+          <div className="w-20 flex justify-center">
+            <LinkButton
+              onClick={() => {
+                router.push("/zap/" + z.id);
+              }}
+            >
+              Go
+            </LinkButton>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

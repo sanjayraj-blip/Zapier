@@ -4,6 +4,8 @@ import { BACKEND_URL } from "@/app/config";
 import Appbar from "@/components/Appbar";
 import DarkButton from "@/components/buttons/DarkButton";
 import LinkButton from "@/components/buttons/LinkButton";
+import PrimaryButton from "@/components/buttons/PrimaryButton";
+import Input from "@/components/Input";
 import ZapCell from "@/components/ZapCell";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -45,6 +47,7 @@ export default function () {
       index: number;
       availableActionId: string;
       availableActionName: string;
+      metadata: any;
     }[]
   >([]);
 
@@ -65,14 +68,14 @@ export default function () {
             if (!selectedTrigger?.id) {
               return;
             }
-            const response = await axios.post(
+            await axios.post(
               `${BACKEND_URL}/api/v1/zap`,
               {
                 availabletriggerId: selectedTrigger.id,
                 triggerMetaData: {},
                 actions: selectedActions.map((a) => ({
                   availableactionId: a.availableActionId,
-                  actionMetaData: {},
+                  actionMetaData: a.metadata,
                 })),
               },
               {
@@ -87,7 +90,7 @@ export default function () {
           Publish
         </DarkButton>
       </div>
-      <div className="w-full min-h-screen bg-slate-200 flex flex-col justify-center">
+      <div className="w-full min-h-screen bg-slate-200 flex flex-col items-center justify-center gap-4">
         <div className="flex justify-center w-full">
           <ZapCell
             onClick={() => {
@@ -97,9 +100,9 @@ export default function () {
             index={1}
           />
         </div>
-        <div className="w-full pt-2 pb-2">
+        <div className="w-full flex flex-col items-center gap-2">
           {selectedActions.map((action) => (
-            <div key={action.index} className="flex justify-center pt-2">
+            <div key={action.index} className="flex justify-center">
               <ZapCell
                 onClick={() => {
                   setSelectedModalIndex(action.index);
@@ -114,7 +117,7 @@ export default function () {
             </div>
           ))}
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center pt-4">
           <LinkButton
             onClick={() => {
               setSelectedActions((a) => [
@@ -123,6 +126,7 @@ export default function () {
                   index: a.length + 2,
                   availableActionId: "",
                   availableActionName: "",
+                  metadata: {},
                 },
               ]);
             }}
@@ -134,7 +138,9 @@ export default function () {
       {selectedModalIndex && (
         <Modal
           availableItems={selectedModalIndex === 1 ? triggers : actions}
-          onSelect={(props: null | { name: string; id: string }) => {
+          onSelect={(
+            props: null | { name: string; id: string; metadata?: any },
+          ) => {
             if (props === null) {
               setSelectedModalIndex(null);
               return;
@@ -151,6 +157,7 @@ export default function () {
                   index: selectedModalIndex,
                   availableActionId: props.id,
                   availableActionName: props.name,
+                  metadata: props.metadata || {},
                 };
                 return newActions;
               });
@@ -170,9 +177,16 @@ function Modal({
   availableItems,
 }: {
   index: number;
-  onSelect: (props: null | { name: string; id: string }) => void;
+  onSelect: (props: null | { name: string; id: string; metadata?: any }) => void;
   availableItems: { id: string; name: string; image: string }[];
 }) {
+  const [step, setSelectedStep] = useState(0);
+  const [selectedAction, setSelectedAction] = useState<{
+    id: string;
+    name: string;
+  }>();
+  const isTrigger = index === 1;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="relative p-4 w-full max-w-2xl max-h-full">
@@ -210,26 +224,93 @@ function Modal({
           </div>
 
           <div className="space-y-2 md:py-6">
-            <p className="text-gray-700">
-              Select a trigger for your automation:
-            </p>
             <div className="space-y-2">
-              {availableItems.map(({ id, name, image }) => {
-                return (
-                  <div
-                    key={id}
-                    onClick={() => onSelect({ id, name })}
-                    className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition flex items-center gap-3"
-                  >
-                    <img src={image} width={30} alt={name} />
-                    <div>{name}</div>
-                  </div>
-                );
-              })}
+              {step === 1 && selectedAction?.name === "Send Email" && (
+                <EmailSelector
+                  setMetadata={(metadata) => {
+                    onSelect({
+                      ...selectedAction,
+                      metadata,
+                    });
+                  }}
+                />
+              )}
+
+              {step === 1 && selectedAction?.name === "Create Notion Page" && (
+                <NotionSelector />
+              )}
+
+              {step == 0 && (
+                <div>
+                  {availableItems.map(({ id, name, image }) => {
+                    return (
+                      <div
+                        key={id}
+                        onClick={() => {
+                          if (isTrigger) {
+                            onSelect({ id, name, metadata: {} });
+                          } else {
+                            setSelectedStep((s) => s + 1);
+                            setSelectedAction({
+                              id,
+                              name,
+                            });
+                          }
+                        }}
+                        className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition flex items-center gap-3"
+                      >
+                        <img src={image} width={30} alt={name} />
+                        <div>{name}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function EmailSelector({
+  setMetadata,
+}: {
+  setMetadata: (params: any) => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [body, setBody] = useState("");
+  return (
+    <>
+      <Input
+        label={"To"}
+        type={"text"}
+        placeHolder=""
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <Input
+        label={"Body"}
+        type={"text"}
+        placeHolder=""
+        onChange={(e) => setBody(e.target.value)}
+      />
+      <div className="pt-2">
+        <PrimaryButton
+          onClick={() => {
+            setMetadata({
+              email,
+              body,
+            });
+          }}
+        >
+          Submit
+        </PrimaryButton>
+      </div>
+    </>
+  );
+}
+
+function NotionSelector() {
+  return <>Notion Selector </>;
 }
