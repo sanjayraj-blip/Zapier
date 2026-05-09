@@ -37,4 +37,4 @@ app.post("/hooks/catch/:userId/:zapId", async (req, res) => {
   });
 });
 
-app.listen(3000, () => console.log("App is running"));
+app.listen(3002, () => console.log("App is running"));
